@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory  android:title="ArUco Parameters"/>
+    <ListPreference
+        android:key="ARUCO::markertype"
+        android:title="Markers"
+        android:summary="Available markers to detect"
+        android:entries="@array/marker_KEY"
+        android:entryValues="@array/marker_KEY"
+        android:defaultValue="ARUCO_MIP_36h12"
+        android:negativeButtonText="Cancel"
+        android:positiveButtonText="Accept"/>
+    <ListPreference
+        android:key="ARUCO::detectionmode"
+        android:title="Detection Mode"
+        android:summary="Aruco Detection Mode"
+        android:entries="@array/DM_KEY"
+        android:entryValues="@array/DM_KEY"
+        android:defaultValue="FAST"
+        android:negativeButtonText="Cancel"
+        android:positiveButtonText="Accept"/>
+    <ListPreference
+        android:key="ARUCO::cornerrefinement"
+        android:title="Corner Refinement Algorithm"
+        android:summary="Aruco Corner Refinement Algorithm"
+        android:entries="@array/CORNER_KEY"
+        android:entryValues="@array/CORNER_KEY"
+        android:defaultValue="SUBPIX"
+        android:negativeButtonText="Cancel"
+        android:positiveButtonText="Accept"/>
+    <EditTextPreference
+        android:key="ARUCO::minmarkersize"
+        android:title="Minimum Detectable Marker size"
+        android:summary="Minimum size of the markers that are detected. Must be a value in the range [0,1]"
+        android:inputType="numberDecimal"
+        android:defaultValue="0"
+        android:negativeButtonText="Cancel"
+        android:positiveButtonText="Ok"
+        android:imeOptions="flagNoExtractUi"/>
+
+    <EditTextPreference
+        android:key="ARUCO::markersize"
+        android:title="Marker size"
+        android:summary="Size of the markers you are using"
+        android:inputType="numberDecimal"
+        android:defaultValue="1"
+        android:negativeButtonText="Cancel"
+        android:positiveButtonText="Ok"
+        android:imeOptions="flagNoExtractUi"/>
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="ARUCO::detect_enclosed"
+        android:title="Detect enclosed markers"
+        android:summary="Enables/Disables detection of enclosed markersusing"
+        />
+
+</PreferenceScreen>

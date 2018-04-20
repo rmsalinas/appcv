@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory  android:title="Resolution"/>
+
+    <com.uco.ava.appcv.ResolutionsPreference
+        android:key="resolution"
+        android:title="Available resolutions"
+        android:summary="Choose a camera resolution"
+        android:defaultValue="0"
+         />
+
+
+</PreferenceScreen>

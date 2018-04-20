@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="marker_KEY">
+        <item name="name1">ARUCO_MIP_36h12</item>
+        <item name="name2">ARUCO</item>
+        <item name="name12">ARUCO_MIP_25h7</item>
+        <item name="name11">ARUCO_MIP_16h3 </item>
+        <item name="name3">ARTOOLKITPLUSBCH</item>
+        <item name="name4">ARTOOLKITPLUS</item>
+        <item name="name5">CHILITAGS</item>
+        <item name="name6">APRIL_TAG16h5</item>
+        <item name="name7">APRIL_TAG25h7</item>
+        <item name="name8">APRIL_TAG25h9</item>
+        <item name="name9">APRIL_TAG36h11</item>
+        <item name="name10">APRIL_TAG36h10</item>
+    </string-array>
+
+
+    <string-array name="DM_KEY">
+        <item name="number1">NORMAL</item>
+        <item name="number2">FAST</item>
+        <item name="number3">VIDEO_FAST</item>
+    </string-array>
+
+    <string-array name="CORNER_KEY">
+        <item name="number1">SUBPIX</item>
+        <item name="number2">LINES</item>
+        <item name="number3">NONE</item>
+    </string-array>
+</resources>

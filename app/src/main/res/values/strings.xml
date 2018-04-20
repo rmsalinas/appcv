@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ArUco Test</string>
+    <string name="camerapermission">Camera Permission</string>
+    <string name="camerapermission_message">Need Camera Permission</string>
+    <string name="writepermission">External Storage Permission</string>
+    <string name="writepermission_message">Need I/O Permission </string>
+</resources>
