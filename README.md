@@ -1,6 +1,6 @@
 appcv
 =====
-appcv is the code employed for the android application to test ArUco library. The code opens the camera, allows to calibrate it and to test and configure the detection of markers.
+appcv is the code employed for the [android application](https://play.google.com/store/apps/details?id=com.uco.ava.appcv) to test ArUco library. The code opens the camera, allows to calibrate it and to test and configure the detection of markers.
 
 ##
 ## Citing
