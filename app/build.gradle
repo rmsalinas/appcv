@@ -11,8 +11,8 @@ android {
         applicationId "com.uco.ava.appcv"
         minSdkVersion 23
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
 
@@ -41,7 +41,7 @@ android {
                 reset()
 
                 // Specifies a list of ABIs that Gradle should create APKs for.
-                include "armeabi-v7a", "x86"
+                include "armeabi-v7a"//, "x86"
 
                 // Specifies that we do not want to also generate a universal APK that includes all ABIs.
                 universalApk false
