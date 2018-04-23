@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
@@ -33,13 +34,13 @@ import uco.ava.calibration.CameraCalibrations;
 
 // OpenCV Classes
 
-public class SampleActivityWithInteraction extends Activity implements CvCameraViewListener2, View.OnTouchListener {
+public class SampleActivityWithInteraction extends AppCompatActivity implements CvCameraViewListener2, View.OnTouchListener {
     static {
         System.loadLibrary("sampleactivity_wi_jni");
     }
 
     // Used for logging success or failure messages
-    private static final String TAG = "SampleActivityWithInteraction";
+    private static final String TAG = "SampleActivityWI";
 
     // Loads camera view of OpenCV for us to use. This lets us see using OpenCV
     private JavaCameraView mOpenCvCameraView;
@@ -143,6 +144,8 @@ public class SampleActivityWithInteraction extends Activity implements CvCameraV
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
         mapdler.postDelayed(runmaple, 5);
+        //makes the window in inmersive mode
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
     }
 
     public void onDestroy() {

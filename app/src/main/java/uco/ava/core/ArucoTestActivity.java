@@ -53,7 +53,7 @@ import uco.ava.calibration.CameraCalibrations;
 
 // OpenCV Classes
 
-public class ArucoTestActivity extends Activity implements CvCameraViewListener2 {
+public class ArucoTestActivity extends AppCompatActivity implements CvCameraViewListener2 {
     static {
 
         System.loadLibrary("arucotestactivity_jni");
@@ -67,7 +67,7 @@ public class ArucoTestActivity extends Activity implements CvCameraViewListener2
 
     private Toast toastMain;
     public int cameraWidth=0,cameraHeight=0;
-    boolean isGoggleModeActive=false;
+    boolean isGoggleModeActive=false,showThresholdedImage=false;
     ImageButton calibButton;
 
 
@@ -143,16 +143,13 @@ public class ArucoTestActivity extends Activity implements CvCameraViewListener2
     }
 
     private void setCalibration(){
-        calibButton=findViewById(R.id.calibration);
         if (CameraCalibrations.isCalibrated(cameraWidth, cameraHeight)) {
             String calibration = CameraCalibrations.readCalibration(cameraWidth, cameraHeight);
             boolean res = jniSetCalibrationParams(calibration);
             Log.d("SAAMPLE", "calib =" + res);
-            calibButton.setVisibility(SurfaceView.GONE);
         }
         else {
             showMessage("Uncalibrated: Calibrate for 3D features");
-            calibButton.setVisibility(SurfaceView.VISIBLE);
         }
     }
     @Override
@@ -177,6 +174,8 @@ public class ArucoTestActivity extends Activity implements CvCameraViewListener2
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
         setCalibration();
+        //makes the window in inmersive mode
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 
     }
 
@@ -211,7 +210,7 @@ public class ArucoTestActivity extends Activity implements CvCameraViewListener2
         Mat rgba=inputFrame.rgba();
         cameraWidth=rgba.width();
         cameraHeight=rgba.height();
-        jniProcessCameraFrame(inputFrame.gray().getNativeObjAddr(),rgba.getNativeObjAddr(),isGoggleModeActive);
+        jniProcessCameraFrame(inputFrame.gray().getNativeObjAddr(),rgba.getNativeObjAddr(),isGoggleModeActive,showThresholdedImage);
         Log.d(JNITAG,jniGetLog());
         return rgba; // This function must return
     }
@@ -243,7 +242,7 @@ public class ArucoTestActivity extends Activity implements CvCameraViewListener2
     }
 
     void onGogglesBtnClicked(View v){
-        ImageButton button= findViewById(R.id.goggles);
+        FloatingActionButton button= findViewById(R.id.goggles);
         isGoggleModeActive=!isGoggleModeActive;
         if (isGoggleModeActive)
             button.setImageResource(R.drawable.ic_goggles_deactived);
@@ -267,7 +266,7 @@ public class ArucoTestActivity extends Activity implements CvCameraViewListener2
     public native void jniInitNativeCalib();
 
     public native void jniSetMarkerDetectorParameters(String MarkerType,String DetectionMode,String CornerRefinement,float minmarkersize,float markerSize,boolean detectEnclosed );
-    public native void jniProcessCameraFrame(long imgGray, long imgColor,boolean splitView4Goggles);
+    public native void jniProcessCameraFrame(long imgGray, long imgColor,boolean splitView4Goggles,boolean showThreshold);
     public native boolean jniSetCalibrationParams(String str);
     public native String jniGetLog();
 

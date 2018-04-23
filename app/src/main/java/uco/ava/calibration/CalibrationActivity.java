@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -15,10 +16,13 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,12 +49,12 @@ import java.io.InputStream;
 
 // OpenCV Classes
 
-public class CalibrationActivity extends Activity implements CvCameraViewListener2 {
+public class CalibrationActivity extends AppCompatActivity implements CvCameraViewListener2 {
     static {
 
         System.loadLibrary("calibration_jni");
     }
-     // Used for logging success or failure messages
+    // Used for logging success or failure messages
     private static final String TAG = "OCVSample::Activity";
 
     // Loads camera view of OpenCV for us to use. This lets us see using OpenCV
@@ -142,6 +146,8 @@ public class CalibrationActivity extends Activity implements CvCameraViewListene
             Log.d(TAG, "OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
+        //makes the window in inmersive mode
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
     }
 
     public void onDestroy() {
@@ -155,7 +161,7 @@ public class CalibrationActivity extends Activity implements CvCameraViewListene
         Log.i(TAG, "called onBackPressed");
 
 
-        if (getNCalibrationImages()==0)             super.onBackPressed();
+        if (getNCalibrationImages()==0) super.onBackPressed();
         else         messenger("Press again to stop the calibration");
 
         if (backButtonPressedOnce) {
@@ -178,11 +184,11 @@ public class CalibrationActivity extends Activity implements CvCameraViewListene
 
     public void onCameraViewStarted(int width, int height) {
 
-       // mRgba = new Mat(height, width, CvType.CV_8UC4);
+        // mRgba = new Mat(height, width, CvType.CV_8UC4);
     }
 
     public void onCameraViewStopped() {
-     }
+    }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 
@@ -223,38 +229,43 @@ public class CalibrationActivity extends Activity implements CvCameraViewListene
         markerSizeDialog.setText(String.valueOf(defValue));
 
 
-          final float[] res=new float[1];
-          res[0]=defValue;
-            android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
-            alertDialog.setTitle("Marker size");
-            alertDialog.setMessage("Enter the marker size");
-            alertDialog.setView(markerSizeDialog);
-            alertDialog.setButton(Dialog.BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
+        final float[] res=new float[1];
+        res[0]=defValue;
+        android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Marker size");
+        alertDialog.setMessage("Enter the marker size");
+        alertDialog.setView(markerSizeDialog);
+        alertDialog.setButton(Dialog.BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
 
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // Value of EditText
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Value of EditText
 
-                    float userMarkerSize=  Float.valueOf(markerSizeDialog.getText().toString());
-                    if (userMarkerSize<=0)askUserMarkerSize(res[0]);
-                    else {
-                        PreferenceManager.getDefaultSharedPreferences(CalibrationActivity.this).edit().putFloat("Calibration:MarkerSize", res[0]);
-                        calibrateFunction();
-                    }
+                float userMarkerSize= Float.valueOf(markerSizeDialog.getText().toString());
+                if (userMarkerSize<=0)askUserMarkerSize(res[0]);
+                else {
+                    PreferenceManager.getDefaultSharedPreferences(CalibrationActivity.this).edit().putFloat("Calibration:MarkerSize", res[0]);
+                    calibrateFunction();
                 }
-            });
-            alertDialog.setButton(android.app.AlertDialog.BUTTON_NEGATIVE, "Cancel",
-                    new DialogInterface.OnClickListener() {
+            }
+        });
+        alertDialog.setButton(android.app.AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Value of EditText
-                            res[0]= -1;
-                        }}
-                        );
-            alertDialog.setCancelable(false);
-            alertDialog.setCanceledOnTouchOutside(false);
-            alertDialog.show();
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Value of EditText
+                        res[0]= -1;
+                    }}
+        );
+        alertDialog.setCancelable(false);
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        alertDialog.show();
+        //Set the dialog to immersive
+        alertDialog.getWindow().getDecorView().setSystemUiVisibility(this.getWindow().getDecorView().getSystemUiVisibility());
+        //Clear the not focusable flag from the window
+        alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 
     public void onClick_CalibrationBtn(View v){
@@ -266,105 +277,108 @@ public class CalibrationActivity extends Activity implements CvCameraViewListene
         }
 
 
-        Float markerSize =  PreferenceManager.getDefaultSharedPreferences(this).getFloat("Calibration:MarkerSize",1);
+        Float markerSize = PreferenceManager.getDefaultSharedPreferences(this).getFloat("Calibration:MarkerSize",1);
 
         askUserMarkerSize(markerSize);
 
+    }
+
+
+    public void calibrateFunction(){
+        Float markerSize = PreferenceManager.getDefaultSharedPreferences(this).getFloat("Calibration:MarkerSize",1);
+        if (markerSize.floatValue()<=0) return;
+
+
+        isCalibrating=true;
+        String[] result = calibrate(markerSize.floatValue());
+        isCalibrating=false;
+        messenger(result[1]);
+        CameraCalibrations.saveCalibration(result[0],cameraWidth,cameraHeight);
+        clearCalibrationVec();
+        String number=String.valueOf(getNCalibrationImages());
+        if(number.length()==1) number="0"+number;
+        ((Button) findViewById(R.id.count_bubble)).setText(number);
+
+        if(CameraCalibrations.isCalibrated(cameraWidth,cameraHeight))
+            ShareCalibBtn.setEnabled(true);
+    }
+
+    public void sendCalibrationFile(){
+        String fileContents = CameraCalibrations.readCalibration(cameraWidth,cameraHeight);
+        if (fileContents.length()==0) return;
+
+
+        String filename = "calibration_"+cameraWidth+"x"+cameraHeight+".yml";
+        String calibDirPath = Environment.getExternalStorageDirectory() + File.separator + "AVA"+ File.separator +"CameraParameters";
+        File calibDirPathFile = new File(calibDirPath);
+        if (!calibDirPathFile.exists())
+            calibDirPathFile.mkdirs();
+        String fullpath=calibDirPath+File.separator+filename;
+
+
+
+
+        try {
+            FileOutputStream outputStream = new FileOutputStream(fullpath);
+            outputStream.write(fileContents.getBytes());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-
-        public void calibrateFunction(){
-            Float markerSize =  PreferenceManager.getDefaultSharedPreferences(this).getFloat("Calibration:MarkerSize",1);
-            if (markerSize.floatValue()<=0) return;
+        //   InputStream inputStream = openFileInput(urifile);
 
 
-            isCalibrating=true;
-            String[] result = calibrate(markerSize.floatValue());
-            isCalibrating=false;
-            messenger(result[1]);
-            CameraCalibrations.saveCalibration(result[0],cameraWidth,cameraHeight);
-            clearCalibrationVec();
-            String number=String.valueOf(getNCalibrationImages());
-            if(number.length()==1) number="0"+number;
-            ((Button) findViewById(R.id.count_bubble)).setText(number);
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent .setType("vnd.android.cursor.dir/email");
 
-            if(CameraCalibrations.isCalibrated(cameraWidth,cameraHeight))
-                ShareCalibBtn.setEnabled(true);
-        }
+        // the attachment
+        Uri urifilePath = Uri.parse("file://"+fullpath);
 
-        public void sendCalibrationFile(){
-            String fileContents =  CameraCalibrations.readCalibration(cameraWidth,cameraHeight);
-            if (fileContents.length()==0) return;
+        emailIntent.putExtra(Intent.EXTRA_STREAM,urifilePath);
+        // the mail subject
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Aruco camera parameters");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Latest Aruco parameters file attached");
 
-
-            String filename = "calibration_"+cameraWidth+"x"+cameraHeight+".yml";
-            String calibDirPath = Environment.getExternalStorageDirectory() + File.separator + "AVA"+ File.separator +"CameraParameters";
-            File calibDirPathFile = new File(calibDirPath);
-            if (!calibDirPathFile.exists())
-                calibDirPathFile.mkdirs();
-            String fullpath=calibDirPath+File.separator+filename;
-
-
-
-
-            try {
-                FileOutputStream outputStream = new FileOutputStream(fullpath);
-                outputStream.write(fileContents.getBytes());
-                outputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            //   InputStream inputStream =  openFileInput(urifile);
-
-
-            Intent emailIntent = new Intent(Intent.ACTION_SEND);
-            emailIntent .setType("vnd.android.cursor.dir/email");
-
-            // the attachment
-            Uri urifilePath = Uri.parse("file://"+fullpath);
-
-            emailIntent.putExtra(Intent.EXTRA_STREAM,urifilePath);
-            // the mail subject
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Aruco camera parameters");
-            emailIntent.putExtra(Intent.EXTRA_TEXT, "Latest Aruco parameters file attached");
-
-            startActivity(Intent.createChooser(emailIntent , "Send email..."));
-        }
+        startActivity(Intent.createChooser(emailIntent , "Send email..."));
+    }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode== STORAGEPERMREQUEST_SHARECALIBRESULT && resultCode==RESULT_OK) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                sendCalibrationFile();
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        // getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        switch (requestCode) {
+            case STORAGEPERMREQUEST_SHARECALIBRESULT: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    sendCalibrationFile();
+                }
+                return;
             }
-        }
 
-        if (requestCode== STORAGEPERMREQUEST_SHARECALIBPATTERN && resultCode==RESULT_OK) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                sendCalibrationPatternFile();
+            case STORAGEPERMREQUEST_SHARECALIBPATTERN: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    sendCalibrationPatternFile();
+                }
+                return;
             }
         }
 
     }
-
-
 
     public void onShareBtnClicked(View v){
-
-
-            if (ContextCompat.checkSelfPermission(this,  Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        STORAGEPERMREQUEST_SHARECALIBRESULT);
-            }
-            else
-                sendCalibrationFile();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    STORAGEPERMREQUEST_SHARECALIBRESULT);
+        }
+        else
+            sendCalibrationFile();
     }
+
     public void onShareCalibPatternBtnClicked(View v){
-        if (ContextCompat.checkSelfPermission(this,  Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     STORAGEPERMREQUEST_SHARECALIBPATTERN);
@@ -372,6 +386,7 @@ public class CalibrationActivity extends Activity implements CvCameraViewListene
         else
             sendCalibrationPatternFile();
     }
+
     void sendCalibrationPatternFile(){
 
         //Create dir to path
@@ -381,7 +396,7 @@ public class CalibrationActivity extends Activity implements CvCameraViewListene
             filesDir.mkdirs();
         //save the pattern to the path
 
-        String fullFilePath=filesPath + File.separator +  "aruco_calibration_pattern.pdf";
+        String fullFilePath=filesPath + File.separator + "aruco_calibration_pattern.pdf";
         try {
             InputStream in = getResources().openRawResource(R.raw.calibration_grid);
             FileOutputStream out = null;
@@ -402,20 +417,6 @@ public class CalibrationActivity extends Activity implements CvCameraViewListene
             e.printStackTrace();
         }
 
-
-//        Uri uri = FileProvider.getUriForFile(this,BuildConfig.APPLICATION_ID + ".provider", new File(fullFilePath));
-
-  //      Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-    //    intent.setDataAndType(uri, "*/*");
-
-      //  startActivity(Intent.createChooser(intent, "Open folder"));
-
-        //try {
-       //     startActivity(intent);
-        //}
-//        catch (android.content.ActivityNotFoundException ex)
- //       {
-  //      }
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
         emailIntent .setType("vnd.android.cursor.dir/email");
 
@@ -440,11 +441,4 @@ public class CalibrationActivity extends Activity implements CvCameraViewListene
     public native int getNCalibrationImages();
     public native void clearCalibrationVec();
     public native String[] calibrate(float markerSize);
-
-
-
-
-
-
-
 }

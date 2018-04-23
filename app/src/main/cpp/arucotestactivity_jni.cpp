@@ -73,15 +73,21 @@ Java_uco_ava_core_ArucoTestActivity_jniSetMarkerDetectorParameters(JNIEnv *env,
 JNIEXPORT void JNICALL
 Java_uco_ava_core_ArucoTestActivity_jniProcessCameraFrame(
         JNIEnv *env,
-        jobject, jlong ImageGray, jlong ImageColor,jboolean splitView4Goggles) {
+        jobject, jlong ImageGray, jlong ImageColor,jboolean splitView4Goggles,jboolean showThreshold) {
     cv::Mat &matgray = *(cv::Mat *) ImageGray;
     cv::Mat &matcolor = *(cv::Mat *) ImageColor;
 
-    if (matgray.type() != CV_8UC1) return;
+        if (matgray.type() != CV_8UC1) return;
 
-    std::unique_lock<std::mutex> lock(detectionMutex);
+        std::unique_lock<std::mutex> lock(detectionMutex);
 
-    lastDetectedMarkers = MDetector.detect(matgray, cameraParameters, markerSize);
+        lastDetectedMarkers = MDetector.detect(matgray, cameraParameters, markerSize);
+
+
+
+    if (showThreshold)
+        cv::cvtColor(MDetector.getThresholdedImage(),matcolor,CV_GRAY2BGRA);
+
 
     LogStream << "jniProcessCameraFrame: " << cameraParameters.isValid() << endl;
 
@@ -91,8 +97,9 @@ Java_uco_ava_core_ArucoTestActivity_jniProcessCameraFrame(
 
     if (cameraParameters.isValid()) {
         for (auto m:lastDetectedMarkers)
-            aruco::CvDrawingUtils::draw3dCube(matcolor, m, cameraParameters,2);
+            aruco::CvDrawingUtils::draw3dCube(matcolor, m, cameraParameters, 2);
     }
+
     if(splitView4Goggles) splitView(matcolor);
 
 }

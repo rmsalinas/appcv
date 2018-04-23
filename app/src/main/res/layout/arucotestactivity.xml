@@ -78,38 +78,26 @@
             fab:fab_label="Settings"
             android:onClick="onSettingsBtnClicked"
             />
-
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/goggles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_goggles_active"
+            fab:fab_size="mini"
+            fab:fab_label="Split View"
+            android:onClick="onGogglesBtnClicked"
+            />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/calibration_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_calibration"
+            fab:fab_size="mini"
+            fab:fab_label="Calibration"
+            android:onClick="onCalibrationBtnClicked"
+            />
 
     </com.github.clans.fab.FloatingActionMenu>
 
-    <ImageButton
-        android:id="@+id/goggles"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/button_style"
-        android:elevation="2dp"
-        android:onClick="onGogglesBtnClicked"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_goggles_active"
-        android:translationZ="2dp"
-        opencv:layout_constraintBottom_toBottomOf="parent"
-        opencv:layout_constraintEnd_toEndOf="parent" />
 
-
-    <ImageButton
-        android:id="@+id/calibration"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/button_style"
-        android:elevation="2dp"
-        android:onClick="onCalibrationBtnClicked"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_calibration"
-        android:translationZ="2dp"
-        opencv:layout_constraintEnd_toEndOf="parent"
-        opencv:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -35,7 +36,7 @@ import uco.ava.calibration.CameraCalibrations;
 
 // OpenCV Classes
 
-public class MainActivity extends  Activity implements CvCameraViewListener2 {
+public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
 
     // Used for logging success or failure messages
     private static final String TAG = "OCVSample::Activity";
@@ -143,6 +144,8 @@ public class MainActivity extends  Activity implements CvCameraViewListener2 {
         }
 
         if (isCameraOpened) updateCameraResolution();
+        //makes the window in inmersive mode
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
     }
 
     public void onDestroy() {
