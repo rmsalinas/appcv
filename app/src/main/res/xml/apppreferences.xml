@@ -4,7 +4,7 @@
 
     <PreferenceCategory  android:title="Resolution"/>
 
-    <com.uco.ava.appcv.ResolutionsPreference
+    <uco.ava.core.ResolutionsPreference
         android:key="resolution"
         android:title="Available resolutions"
         android:summary="Choose a camera resolution"

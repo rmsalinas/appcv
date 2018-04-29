@@ -287,8 +287,8 @@ public class ArucoTestActivity extends AppCompatActivity implements CvCameraView
     public void onCalibrationBtnClicked(View v){
         // setCameraResolution();
         Intent intent=new Intent(this,CalibrationActivity.class);
-         intent.putExtra("width",cameraWidth);
-        intent.putExtra("height", cameraHeight);
+         intent.putExtra("width",(int) cameraWidth);
+        intent.putExtra("height",(int) cameraHeight);
         startActivity(intent);
     }
 

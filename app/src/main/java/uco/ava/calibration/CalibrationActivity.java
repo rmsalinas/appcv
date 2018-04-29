@@ -293,7 +293,10 @@ public class CalibrationActivity extends AppCompatActivity implements CvCameraVi
         String[] result = calibrate(markerSize.floatValue());
         isCalibrating=false;
         messenger(result[1]);
-        CameraCalibrations.saveCalibration(result[0],cameraWidth,cameraHeight);
+        String log=jniGetLog();
+        Log.d("CAL",log);
+        String cameraParams=jniGetCalibratedCameraParams();
+        CameraCalibrations.saveCalibration(cameraParams,cameraWidth,cameraHeight);
         clearCalibrationVec();
         String number=String.valueOf(getNCalibrationImages());
         if(number.length()==1) number="0"+number;
@@ -441,4 +444,6 @@ public class CalibrationActivity extends AppCompatActivity implements CvCameraVi
     public native int getNCalibrationImages();
     public native void clearCalibrationVec();
     public native String[] calibrate(float markerSize);
+    public native String jniGetCalibratedCameraParams();
+    public native String jniGetLog();
 }

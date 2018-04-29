@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory  android:title="Camera Resolution"/>
+
+    <uco.ava.core.ResolutionsPreference
+        android:key="resolution"
+        android:title="Available resolutions"
+        android:summary="Choose a camera resolution"
+        android:defaultValue="0"
+        />
+
     <PreferenceCategory  android:title="ArUco Parameters"/>
     <ListPreference
         android:key="ARUCO::markertype"
@@ -51,7 +61,7 @@
         android:defaultValue="false"
         android:key="ARUCO::detect_enclosed"
         android:title="Detect enclosed markers"
-        android:summary="Enables/Disables detection of enclosed markersusing"
+        android:summary="Enables/Disables detection of enclosed markers"
         />
 
 </PreferenceScreen>

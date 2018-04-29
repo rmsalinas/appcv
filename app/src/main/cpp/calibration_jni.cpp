@@ -13,7 +13,11 @@ namespace Java_uco_ava_calibration_CalibrationActivity {
     static std::vector<std::vector<aruco::Marker> > CalibrationMarkers;
     static std::mutex detectionMutex;
     static aruco::MarkerDetector MDetector;
+    static aruco::CameraParameters _CameraParameters;
     static cv::Size imageSize;
+    static std::stringstream LogStream,CameraParamsStream;
+
+
 };
 
 
@@ -81,11 +85,12 @@ JNIEXPORT jobjectArray JNICALL
 Java_uco_ava_calibration_CalibrationActivity_calibrate( JNIEnv *env,jobject,jfloat markersize) {
 
     float repjerr=0;
-    auto cp=cameraCalibrate(CalibrationMarkers,imageSize.width,imageSize.height,markersize,&repjerr);
+    _CameraParameters=cameraCalibrate(CalibrationMarkers,imageSize.width,imageSize.height,markersize,&repjerr);
 
 
     std::stringstream cp_str;
-    cp_str<<cp;
+    cp_str<<_CameraParameters;
+    LogStream<<_CameraParameters;
 
     //Se convierte el error (float) en texto
     char charcurrRepjErr[50];
@@ -101,6 +106,23 @@ Java_uco_ava_calibration_CalibrationActivity_calibrate( JNIEnv *env,jobject,jflo
     env->SetObjectArrayElement(ParamYErr, 1, env->NewStringUTF(charcurrRepjErr));
 
     return ParamYErr;
+
+}
+JNIEXPORT jstring JNICALL
+Java_uco_ava_calibration_CalibrationActivity_jniGetLog(JNIEnv *env, jobject) {
+
+
+    string str = LogStream.str();
+    LogStream.str(std::string());
+    return env->NewStringUTF(str.c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_uco_ava_calibration_CalibrationActivity_jniGetCalibratedCameraParams(JNIEnv *env, jobject) {
+    CameraParamsStream.str(std::string());
+    CameraParamsStream<<_CameraParameters;
+    string str = CameraParamsStream.str();
+    return env->NewStringUTF(str.c_str());
 
 }
 

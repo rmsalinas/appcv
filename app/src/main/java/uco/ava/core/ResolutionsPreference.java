@@ -1,8 +1,10 @@
-package com.uco.ava.appcv;
+package uco.ava.core;
 
 import android.content.Context;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
+
+import com.uco.ava.appcv.MainActivity;
 
 import uco.ava.calibration.CameraCalibrations;
 
