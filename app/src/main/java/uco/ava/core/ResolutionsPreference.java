@@ -4,7 +4,10 @@ import android.content.Context;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
 
-import com.uco.ava.appcv.MainActivity;
+
+import org.opencv.core.Size;
+
+import java.util.List;
 
 import uco.ava.calibration.CameraCalibrations;
 
@@ -17,11 +20,13 @@ public class ResolutionsPreference extends ListPreference {
     public ResolutionsPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-          String[] evalues = new String[MainActivity.CameraResolutions.size()];
-           String[] eentries =  new String[MainActivity.CameraResolutions.size()];
-           for(int i=0;i<MainActivity.CameraResolutions.size();i++){
-               eentries[i]= String.valueOf(MainActivity.CameraResolutions.get(i).width)+"x"+String.valueOf(MainActivity.CameraResolutions.get(i).height);
-               if (CameraCalibrations.isCalibrated(MainActivity.CameraResolutions.get(i).width,MainActivity.CameraResolutions.get(i).height))
+
+        List<Size> resolutions=CameraResolutions.getKnownCameraResolutions(context);
+          String[] evalues = new String[resolutions.size()];
+           String[] eentries =  new String[resolutions.size()];
+           for(int i=0;i<resolutions.size();i++){
+               eentries[i]= String.valueOf((int)(resolutions.get(i).width))+"x"+String.valueOf((int)resolutions.get(i).height);
+               if (CameraCalibrations.isCalibrated((int)resolutions.get(i).width,(int)resolutions.get(i).height))
                    eentries[i]+=" (Calibrated)"  ;
                evalues[i]=String.valueOf(i);
            }
