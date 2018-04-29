@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,6 +48,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import uco.ava.calibration.CalibrationActivity;
 import uco.ava.calibration.CameraCalibrations;
@@ -62,12 +66,13 @@ public class ArucoTestActivity extends AppCompatActivity implements CvCameraView
      private static final String TAG = "ArucoTestActivity";
     private static final String JNITAG = "JNIArucoTestActivity";
 
+    private final int CAMERAPERMISSIONREQUESTCODE = 1;
     // Loads camera view of OpenCV for us to use. This lets us see using OpenCV
     private JavaCameraView mOpenCvCameraView;
 
     private Toast toastMain;
     public int cameraWidth=0,cameraHeight=0;
-    boolean isGoggleModeActive=false,showThresholdedImage=false;
+    boolean isGoggleModeActive=false,showThresholdedImage=false,isCameraConnected=false;
     ImageButton calibButton;
 
 
@@ -94,12 +99,23 @@ public class ArucoTestActivity extends AppCompatActivity implements CvCameraView
         Log.i(TAG, "Instantiated new " + this.getClass());
     }
 
+    private void askForPermissions() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    CAMERAPERMISSIONREQUESTCODE);
+
+        }
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
-
+        askForPermissions();
 
 
         setContentView(R.layout.arucotestactivity);
@@ -115,21 +131,24 @@ public class ArucoTestActivity extends AppCompatActivity implements CvCameraView
             cameraWidth = b.getInt("width");
             cameraHeight = b.getInt("height");
         }
-        else finishAffinity();
+        else{
+            //is it the first time?
+            Size csize=CameraResolutions.getSelectedCameraSize(this);
+                cameraWidth = (int) csize.width;
+                cameraHeight = (int) csize.height;
+        }
 
 
+        CameraCalibrations.setContext(this);
 
         jniInitNativeCalib();
         setMarkerDetectorParameters();
 
-
         mOpenCvCameraView = findViewById(R.id.show_camera_activity_java_surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
-
-        if ( cameraWidth*cameraHeight<=0) finishAffinity();
-
-        mOpenCvCameraView.setMaxFrameSize(cameraWidth,cameraHeight);
+        if (cameraWidth*cameraWidth>0)//set initial resolution if possible
+            mOpenCvCameraView.setMaxFrameSize(cameraWidth,cameraHeight);
     }
 
     private void showMessage(String message) {
@@ -196,12 +215,15 @@ public class ArucoTestActivity extends AppCompatActivity implements CvCameraView
 
 
     public void onCameraViewStarted(int width, int height) {
-
-       // mRgba = new Mat(height, width, CvType.CV_8UC4);
+        //creates if neccessary. Does nothing otherwise
+        CameraResolutions.createListOfCameraResolutions(this,mOpenCvCameraView,width,height);
+        CameraResolutions.updateCurrentResolution(this,width,height);
+        isCameraConnected=true;
     }
 
     public void onCameraViewStopped() {
-     }
+        isCameraConnected=false;
+    }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 
@@ -215,6 +237,15 @@ public class ArucoTestActivity extends AppCompatActivity implements CvCameraView
         return rgba; // This function must return
     }
 
+    public void updateCameraResolution() {
+        Size size = CameraResolutions.getSelectedCameraSize(this);
+        mOpenCvCameraView.setMaxFrameSize((int) size.width, (int) size.height);
+        cameraWidth=(int)size.width;
+        cameraHeight=(int)size.height;
+        mOpenCvCameraView.disableView();
+        mOpenCvCameraView.enableView();
+
+    }
     private void messenger(String message) {
         Log.i(TAG, "called messenger");
 
@@ -223,7 +254,7 @@ public class ArucoTestActivity extends AppCompatActivity implements CvCameraView
         toastMain.show();
     }
 
-    void onSettingsBtnClicked(View v){
+    public void onSettingsBtnClicked(View v){
         startActivityForResult(new Intent(this,uco.ava.core.ArucoPreferencesActivity.class),666);
 
     }
@@ -235,13 +266,16 @@ public class ArucoTestActivity extends AppCompatActivity implements CvCameraView
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode==666  )
+        if (requestCode==666  ) {
             setMarkerDetectorParameters();
+            updateCameraResolution();
+            setCalibration();
+        }
 
 
     }
 
-    void onGogglesBtnClicked(View v){
+    public void onGogglesBtnClicked(View v){
         FloatingActionButton button= findViewById(R.id.goggles);
         isGoggleModeActive=!isGoggleModeActive;
         if (isGoggleModeActive)
@@ -249,18 +283,22 @@ public class ArucoTestActivity extends AppCompatActivity implements CvCameraView
         else
             button.setImageResource(R.drawable.ic_goggles_active);
     }
-    void onCalibrationBtnClicked(View v){
+
+    public void onCalibrationBtnClicked(View v){
         // setCameraResolution();
         Intent intent=new Intent(this,CalibrationActivity.class);
-         intent.putExtra("width",(int) cameraWidth);
-        intent.putExtra("height",(int) cameraHeight);
-        startActivity(intent);    }
+         intent.putExtra("width",cameraWidth);
+        intent.putExtra("height", cameraHeight);
+        startActivity(intent);
+    }
 
     void setMarkerDetectorParameters(){
         ArucoPreferences.loadFromPreferences(this);
         jniSetMarkerDetectorParameters( ArucoPreferences.MarkerType,ArucoPreferences.DetectionMode,ArucoPreferences.CornerRefinement,ArucoPreferences.minmarkersize,ArucoPreferences.markersize,ArucoPreferences.detectEnclosed);
 
     }
+
+
     //----  JNI
 
     public native void jniInitNativeCalib();
