@@ -8,16 +8,13 @@ appcv is the code employed for the [android application](https://play.google.com
 If use this project please cite
 
 ```
-@article{Aruco2014,
- title = "Automatic generation and detection of highly reliable fiducial markers under occlusion ",
- journal = "Pattern Recognition ",
- volume = "47",
- number = "6",
- pages = "2280 - 2292",
- year = "2014",
- issn = "0031-3203",
- doi = "http://dx.doi.org/10.1016/j.patcog.2014.01.005",
- url = "http://www.sciencedirect.com/science/article/pii/S0031320314000235",
- author = "S. Garrido-Jurado and R. Mu\~noz-Salinas and F.J. Madrid-Cuevas and M.J. Mar\'in-Jim\'enez"
+@article{ROMERORAMIREZ201838,
+title = "Speeded up detection of squared fiducial markers",
+journal = "Image and Vision Computing",
+volume = "76",
+pages = "38 - 47",
+year = "2018",
+issn = "0262-8856",
+author = "Francisco J. Romero-Ramirez and Rafael Muñoz-Salinas and Rafael Medina-Carnicer"
 }
 ```
